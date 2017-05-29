@@ -38,12 +38,19 @@ def scraper (sessionToken):
         elif response.getcode == 404:
             print 'Profile ' + str(currentProfile) + ' returned a 404 error.'
 
-        elif response.getcode == 302:
-            print ' Got a 302 back.  We probably got locked out.  If at first you don\'t succeed, try try again.'
+        elif response.getcode == 302 and response.read().index('tripped our security system.') != -1:
+            print 'Whoops, the security system caught us.   If at first you don\'t succeed, try try again.'
             sys.exit()
 
+        elif response.getcode == 302:
+            print 'Looks like we got signed out.  Need a new session token.'
+            sys.exit()
+
+        else:
+            print 'Got some bad non-200 OK thing.  Going to move on.'
+
         profiles.remove(currentProfile)
-        print 'Sleeping to avoid tripping the security system again...'
+        print 'Sleeping to avoid tripping security system...'
         sleep(randint(30,300))
 
         #Need to introduce some kind of something to make Fetlife think we're not a bot..60% of the time, load the test account's profile page, 40% of the time, keep spidering
