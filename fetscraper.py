@@ -6,7 +6,6 @@ from time import sleep
 
 
 def main():
-
     if len(sys.argv) < 2:
         print 'Usage:  fetscraper.py <value of logged in session token>'
         sys.exit()
@@ -53,6 +52,11 @@ def scraper (sessionToken):
             garbageRequest.add_header('Connection', 'close')
             throwAwayResponse = urllib2.urlopen(request)
             sleep(randint(30,180)) #wait for a little bit before continuing
+
+
+if __name__ == '__main__':
+    main()
+
 
 
 
