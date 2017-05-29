@@ -30,9 +30,18 @@ def scraper (sessionToken):
         request.add_header('Connection', 'close')
 
         response = urllib2.urlopen(request)
-        PageToParse = response.read()
 
-        #Fill in the parser and JSON converstion stuff here once Amanda sends me schema
+        if response.getcode == 200:
+            PageToParse = response.read()
+            # Fill in the parser and JSON converstion stuff here once Amanda sends me schema
+
+        elif response.getcode == 404:
+            print 'Profile ' + str(currentProfile) + ' returned a 404 error.'
+
+        elif response.getcode == 302:
+            print ' Got a 302 back.  We probably got locked out.  If at first you don\'t succeed, try try again.'
+            sys.exit()
+
         profiles.remove(currentProfile)
         print 'Sleeping to avoid tripping the security system again...'
         sleep(randint(30,300))
