@@ -18,10 +18,12 @@ def scraper (sessionToken):
     minProfile = int(raw_input('Enter the minimum profile integer to start culling from: '))
     maxProfile = int(raw_input('Enter the maximum profile integer to cull to: '))
     profiles = range(minProfile,maxProfile)
+
     print 'Starting profile culling...'
 
     while len(profiles) > 0:
-        currentProfile = randint(0,len(profiles)-1)
+        currentProfile = profiles[randint(0,len(profiles)-1)]
+	pint 'Grabbing https://fetlife.com/users/' + str(currentProfile))
         request = urllib2.Request('https://fetlife.com/users/' + str(currentProfile))
         request.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36')
         request.add_header('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
@@ -29,24 +31,31 @@ def scraper (sessionToken):
         request.add_header('Cookie','language=en; _fl_sessionid=' + sessionToken)
         request.add_header('Connection', 'close')
 
-        response = urllib2.urlopen(request)
+	try:
+        	response = urllib2.urlopen(request)
 
-        if response.getcode == 200:
+	except urllib2.HTTPError:
+		print 'Got an error.  plugging on.'
+		continue
+
+        if response.getcode() == 200:
             PageToParse = response.read()
+	    print PageToParse
             # Fill in the parser and JSON converstion stuff here once Amanda sends me schema
 
-        elif response.getcode == 404:
-            print 'Profile ' + str(currentProfile) + ' returned a 404 error.'
+#        elif response.getcode == 404:
+#            print 'Profile ' + str(currentProfile) + ' returned a 404 error.'
 
-        elif response.getcode == 302 and response.read().index('tripped our security system.') != -1:
+        elif response.getcode() == 302 and response.read().index('tripped our security system.') != -1:
             print 'Whoops, the security system caught us.   If at first you don\'t succeed, try try again.'
             sys.exit()
 
-        elif response.getcode == 302:
+        elif response.getcode() == 302:
             print 'Looks like we got signed out.  Need a new session token.'
             sys.exit()
 
         else:
+	    print response.getcode()
             print 'Got some bad non-200 OK thing.  Going to move on.'
 
         profiles.remove(currentProfile)
